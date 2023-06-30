@@ -1,0 +1,15 @@
+spring: 
+   datasource:
+      username: schools
+      password: schools
+      url: jdbc:mysql://localhost:3306/schools
+      
+   jpa:
+      hibernate:
+         ddl-auto: update
+      show-sql: true
+      defer-datasource-initialization: true
+      
+   sql:
+      init:
+         mode: always

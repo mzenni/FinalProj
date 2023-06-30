@@ -1,0 +1,4 @@
+INSERT INTO school (school_name) VALUES ('East High School'); 
+INSERT INTO school (school_name) VALUES ('West High School');
+INSERT INTO school (school_name) VALUES ('North High School');
+INSERT INTO school (school_name) VALUES ('South High School');   
