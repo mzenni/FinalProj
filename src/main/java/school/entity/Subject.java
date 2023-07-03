@@ -8,10 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -23,16 +20,16 @@ public class Subject {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long subjectId;
 	private String subjectName; // math, history
-	private String subjectLevel; // honors, AP
-	//private int subjectPeriod; 
-	  
+	private String subjectLevel; // honors, AP, etc.   
 	
-	@EqualsAndHashCode.Exclude
+	/*@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true) // the One to many relationship
-	private Set<Teacher> teachers = new HashSet<>(); 
+	private Set<Teacher> teachers = new HashSet<>(); */
 	
 	// Many (school) to Many (subjects)
-	@ManyToMany(mappedBy = "subjects")
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@ManyToMany(mappedBy = "subjects", cascade = CascadeType.PERSIST)
 	private Set<School> schools = new HashSet<>();  
 }

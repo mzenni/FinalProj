@@ -24,18 +24,20 @@ public class School {
 	private Long schoolId;
 	private String schoolName;
 	private String schoolType; // public, private, religious, charter, vocational
-	
-	// One (school) to Many (teachers)
-	@OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
-	@EqualsAndHashCode.Exclude
-	@ToString.Exclude
-	private Set<Teacher> teachers = new HashSet<>(); 
-	
+
 	// Many (school) to Many (subjects)
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToMany(cascade = CascadeType.PERSIST)
-	@JoinTable(name = "school_subject", joinColumns = @JoinColumn(name = "school_id"),inverseJoinColumns = @JoinColumn(name = "subject_id"))
-	private Set<Subject> subjects = new HashSet<>(); 
-	
+	@JoinTable(name = "school_subject", joinColumns = @JoinColumn(name = "school_id"), inverseJoinColumns = @JoinColumn(name = "subject_id"))
+	private Set<Subject> subjects = new HashSet<>();
+
+	// One (school) to Many (teachers)
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
+	// @JoinTable(name = "school_teacher", joinColumns = @JoinColumn(name =
+	// "school_id"), inverseJoinColumns = @JoinColumn(name = "teacher_id"))
+	private Set<Teacher> teachers = new HashSet<>();
+
 }
