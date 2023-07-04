@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
 import school.entity.School;
+import school.entity.Subject;
+import school.entity.Teacher;
 import school.service.SchoolService;
 import schools.controller.model.SchoolData;
+import schools.controller.model.SchoolData.SchoolSubject;
 
 @RestController
 @RequestMapping("/school")
@@ -44,7 +47,8 @@ public class SchoolController {
 	}
 
 	@GetMapping("/school/{schoolId}")
-	public School retrieveSchoolById(@PathVariable Long schoolId) { // is SchoolData the return value or just School? check pet store example 
+	public School retrieveSchoolById(@PathVariable Long schoolId) { // is SchoolData the return value or just School?
+																	// check pet store example
 		log.info("Retrieving school with ID = {} ", schoolId);
 		return schoolService.retrieveSchoolById(schoolId);
 	}
@@ -52,30 +56,47 @@ public class SchoolController {
 	// Teacher
 	@PostMapping("/{schoolId}/teacher")
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public SchoolData.SchoolTeacher insertTeacher(@PathVariable("schoolId") Long schoolId, @RequestBody SchoolData.SchoolTeacher schoolTeacher) {
+	public SchoolData.SchoolTeacher insertTeacher(@PathVariable("schoolId") Long schoolId,
+			@RequestBody SchoolData.SchoolTeacher schoolTeacher) {
 		log.info("Creating teacher {}", schoolTeacher);
 		return schoolService.saveTeacher(schoolId, schoolTeacher);
 	}
-	
+
 	@PutMapping("/teacher/{teacherId}")
-	public SchoolData.SchoolTeacher updateTeacher(@PathVariable Long schoolId, @PathVariable Long teacherId,
+	public SchoolData.SchoolTeacher updateTeacher(@PathVariable Long teacherId,
 			@RequestBody SchoolData.SchoolTeacher schoolTeacher) {
 		schoolTeacher.setTeacherId(teacherId);
 		log.info("Updating teacher {}", schoolTeacher);
-		return schoolService.saveTeacher(schoolId, schoolTeacher);
+//		return schoolService.saveTeacher(schoolTeacher);
+		return schoolService.updateTeacher(teacherId, schoolTeacher);
 	}
 	
+//	@PutMapping("/pet_store/{petStoreId}")
+//	public PetStoreData updatePetStoreData(@PathVariable Long petStoreId, @RequestBody PetStoreData petStoreData) {
+//		petStoreData.setPetStoreId(petStoreId);
+//		log.info("Update pet store {} for ID=", petStoreData);
+//		return petStoreService.savePetStore(petStoreData);
+//	}
+//	
+//	@PutMapping("/teacher/{teacherId}")
+//	public SchoolData.SchoolTeacher updateTeacher(@PathVariable Long schoolId, @PathVariable Long teacherId,
+//			@RequestBody SchoolData.SchoolTeacher schoolTeacher) {
+//		schoolTeacher.setTeacherId(teacherId);
+//		log.info("Updating teacher {}", schoolTeacher);
+//		return schoolService.saveTeacher(schoolId, schoolTeacher);
+//	}
+
+
 	@GetMapping("/teacher")
 	public List<SchoolData.SchoolTeacher> retrieveAllTeachers() {
 		log.info("Retrieve all teachers called.");
 		return schoolService.retrieveAllTeachers();
 	}
 
-	
 	@GetMapping("/teacher/{teacherId}")
-	public schools.controller.model.SchoolData.SchoolTeacher retrieveTeacherById(@PathVariable Long schoolId, @PathVariable Long teacherId) {
+	public Teacher retrieveTeacherById(@PathVariable Long teacherId) {
 		log.info("Retrieving teacher with ID = {} ", teacherId);
-		return schoolService.retrieveTeacherById(schoolId, teacherId); 
+		return schoolService.retrieveTeacherById(teacherId);
 	}
 	
 	@DeleteMapping("/teacher")
@@ -84,29 +105,50 @@ public class SchoolController {
 		throw new UnsupportedOperationException("Deleting all teachers is not allowed.");
 	}
 
-	@DeleteMapping("/{schoolId}/teacher/{teacherId}")
-	public Map<String, String> deleteTeacherById(@PathVariable Long schoolId, @PathVariable Long teacherId) {
+	@DeleteMapping("/teacher/{teacherId}")
+	public Map<String, String> deleteTeacherById(@PathVariable Long teacherId) {
 		log.info("Deleting teacher with ID + {} ", teacherId);
-		schoolService.deleteTeacherById(schoolId, teacherId);
+		schoolService.deleteTeacherById(teacherId);
 		return Map.of("message", "Deletion of teacher with ID = " + teacherId + " was successful.");
 	}
+//	@DeleteMapping("/{schoolId}/teacher/{teacherId}")
+//	public Map<String, String> deleteTeacherById(@PathVariable Long schoolId, @PathVariable Long teacherId) {
+//		log.info("Deleting teacher with ID + {} ", teacherId);
+//		schoolService.deleteTeacherById(schoolId, teacherId);
+//		return Map.of("message", "Deletion of teacher with ID = " + teacherId + " was successful.");
+//	}
 
 	// Subject
-
 	@PostMapping("/{schoolId}/subject")
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public SchoolData.SchoolSubject saveSubject(@PathVariable Long schoolId, @RequestBody schools.controller.model.SchoolData.SchoolSubject schoolSubject) {
+	public SchoolData.SchoolSubject saveSubject(@PathVariable Long schoolId, @RequestBody SchoolSubject schoolSubject) {
 		log.info("Creating subject {}", schoolSubject);
 		return schoolService.saveSubject(schoolId, schoolSubject);
 	}
 
-	@PutMapping("/subject/{subjectId}")
-	public schools.controller.model.SchoolData.SchoolSubject updateSubject(@PathVariable Long schoolId, @PathVariable Long subjectId,
-			@RequestBody schools.controller.model.SchoolData.SchoolSubject schoolSubject) {
+	@PutMapping("subject/{subjectId}")
+	public SchoolData.SchoolSubject updateSubject(@PathVariable Long subjectId,
+			@RequestBody SchoolData.SchoolSubject schoolSubject) {
 		schoolSubject.setSubjectId(subjectId);
-		log.info("Updating teacher {}", schoolSubject);
-		return schoolService.saveSubject(subjectId, schoolSubject);
+		log.info("Updating subject {}", schoolSubject);
+		return schoolService.updateSubject(subjectId, schoolSubject);
 	}
+	
+//	@PutMapping("/teacher/{teacherId}")
+//	public SchoolData.SchoolTeacher updateTeacher(@PathVariable Long teacherId,
+//			@RequestBody SchoolData.SchoolTeacher schoolTeacher) {
+//		schoolTeacher.setTeacherId(teacherId);
+//		log.info("Updating teacher {}", schoolTeacher);
+//		return schoolService.updateTeacher(teacherId, schoolTeacher);
+//	}
+	
+
+//	@PutMapping("/subject/{subjectId}")
+//	public SchoolSubject updateSubject(@PathVariable Long schoolId, @PathVariable Long subjectId, @RequestBody SchoolSubject schoolSubject) {
+//		schoolSubject.setSubjectId(subjectId);
+//		log.info("Updating subject {}", schoolSubject);
+//		return schoolService.saveSubject(schoolSubject);
+//	}
 
 	@GetMapping("/subject")
 	public List<schools.controller.model.SchoolData.SchoolSubject> retrieveAllSubjects() {
@@ -115,9 +157,10 @@ public class SchoolController {
 	}
 
 	@GetMapping("/subject/{subjectId}")
-	public schools.controller.model.SchoolData.SchoolSubject retrieveSubjectById(@PathVariable Long schoolId, @PathVariable Long subjectId) {
+	public Subject retrieveSubjectById(/*@PathVariable Long schoolId,*/
+			@PathVariable Long subjectId) {
 		log.info("Retrieving subject with ID = {} ", subjectId);
-		return schoolService.retrieveSubjectById(schoolId, subjectId);
+		return schoolService.retrieveSubjectById(/*schoolId, */subjectId);
 	}
 }
 
