@@ -30,10 +30,10 @@ public class Teacher {
 	@JoinColumn(name = "school_id")
 	private School school;  
 	
-	/*// Many (teachers) to one (subject)
+	// Many (teachers) to one (subject)
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "subject_id")
-	private Subject subject;*/
+	private Subject subject;
 }

@@ -10,6 +10,7 @@ public class SchoolSubject {
 	private Long subjectId;
 	private String subjectName;
 	private String subjectLevel;
+	private Long schoolId; 
 	
 	// DIDN'T WANT TO DELETE, EVERYTHING BELOW IS FROM BEFORE 7/3
 //	private Long subjectId;

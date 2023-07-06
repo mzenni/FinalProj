@@ -63,4 +63,18 @@ public class SchoolData {
 			teacherEmail = teacher.getTeacherEmail();
 		}
 	}
+	
+	@Data
+	@NoArgsConstructor
+	public class JoinTable {
+
+	    private Long schoolId;
+	    private Long subjectId;
+
+	    public JoinTable(School school, Subject subject) {
+	    	schoolId = school.getSchoolId();
+	    	subjectId = subject.getSubjectId(); 
+	    }
+	}
+
 }

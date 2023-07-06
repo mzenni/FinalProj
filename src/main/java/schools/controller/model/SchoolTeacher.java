@@ -2,8 +2,6 @@ package schools.controller.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.entity.School;
-import school.entity.Teacher;
 
 @Data // creates getters and setters for us
 @NoArgsConstructor

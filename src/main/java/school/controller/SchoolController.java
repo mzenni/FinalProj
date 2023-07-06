@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
-import school.entity.School;
 import school.entity.Subject;
 import school.entity.Teacher;
 import school.service.SchoolService;
@@ -30,7 +29,7 @@ public class SchoolController {
 
 	@Autowired
 	private SchoolService schoolService;
-
+	
 	// Create School
 	@PostMapping("/school")
 	@ResponseStatus(code = HttpStatus.CREATED)
@@ -47,7 +46,7 @@ public class SchoolController {
 	}
 
 	@GetMapping("/school/{schoolId}")
-	public School retrieveSchoolById(@PathVariable Long schoolId) { // is SchoolData the return value or just School?
+	public SchoolData retrieveSchoolById(@PathVariable Long schoolId) { // is SchoolData the return value or just School?
 																	// check pet store example
 		log.info("Retrieving school with ID = {} ", schoolId);
 		return schoolService.retrieveSchoolById(schoolId);
@@ -133,6 +132,7 @@ public class SchoolController {
 		log.info("Updating subject {}", schoolSubject);
 		return schoolService.updateSubject(subjectId, schoolSubject);
 	}
+
 	
 //	@PutMapping("/teacher/{teacherId}")
 //	public SchoolData.SchoolTeacher updateTeacher(@PathVariable Long teacherId,
@@ -162,6 +162,40 @@ public class SchoolController {
 		log.info("Retrieving subject with ID = {} ", subjectId);
 		return schoolService.retrieveSubjectById(/*schoolId, */subjectId);
 	}
+	
+	// school_subject join table
+//	@GetMapping("/school_subject")
+//	public List<SchoolSubject> retrieveAllJoinTable(){
+//		log.info("Retrieve all school subjects called."); 
+//		return schoolService.retrieveAllJoinTable();
+//	}
+	
+	//CURRENT 12:12
+//	@GetMapping("/school_subject")
+//	public List<SchoolData> retrieveAllJoinTable(){
+//		log.info("Retrieve school subject join table called.");
+//		return schoolService.retrieveAllJoinTable(); 
+//	}
+	  
+	  
+//	  @GetMapping("/school_subject")
+//	    public List<Object[]> getAllSchoolSubjects() {
+//	        return schoolSubjectDao.getAllSchoolSubjects();
+//	    }
+	
+	// Get subjects by school 
+//	@GetMapping("/school/({schoolId}/subject")
+//	public Set<Subject> retrieveSubjectsBySchoolId(@PathVariable Long schoolId){
+//		School school = schoolService.findSchoolById(schoolId);
+//		Set<Subject> subjects = school.getSubjects(); 
+//		return subjects; 
+//	}
+	
+//	@GetMapping("/schoolsubject")
+//	public List<schools.controller.model.SchoolData.SchoolSubject> retrieveAllSubjects() {
+//		log.info("Retrieve all subjects called.");
+//		return schoolService.retrieveAllSubjects();
+//	}
 }
 
 //@GetMapping("/teacher/{teacherId}")

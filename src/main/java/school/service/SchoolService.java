@@ -76,7 +76,7 @@ public class SchoolService {
 		return school;
 	}
 
-	private School findSchoolById(Long schoolId) {
+	public School findSchoolById(Long schoolId) {
 		return schoolDao.findById(schoolId).orElse(null);
 	}
 	@Transactional(readOnly = false)
@@ -105,7 +105,7 @@ public class SchoolService {
 	public SchoolTeacher saveTeacher(Long schoolId, SchoolTeacher schoolTeacher) {
 		School school = findSchoolById(schoolId);
 		Long teacherId = schoolTeacher.getTeacherId();
-		Teacher teacher = findOrCreateTeacher(schoolId, schoolTeacher.getTeacherId());
+		Teacher teacher = findOrCreateTeacher(schoolId, teacherId);
 
 		copyTeacherFields(teacher, schoolTeacher);
 
@@ -227,11 +227,18 @@ public class SchoolService {
 		return result;
 	}
 
+	// Testing this method from Slack
+	
 	@Transactional(readOnly = true)
-	public School retrieveSchoolById(Long schoolId) {
+	public SchoolData retrieveSchoolById(Long schoolId) {
+		School school = findSchoolById(schoolId); 
+		return new SchoolData(school); 
+	}
+	/*@Transactional(readOnly = true)
+	public School retrieveSchoolById(Long schoolId) { 
 		return schoolDao.findById(schoolId)
 				.orElseThrow(() -> new NoSuchElementException("School with ID = " + schoolId + " does not exist."));
-	}
+	}*/ 
 
 	public void deleteSchoolById(Long schoolId) {
 		School school = findSchoolById(schoolId);
@@ -274,6 +281,28 @@ public class SchoolService {
 		return subjectDao.findAll().stream().map(SchoolSubject::new).toList();
 		// @formatter: on
 	}
+	
+//	@Transactional(readOnly = true)
+//	public List<SchoolSubject> retrieveAllJoinTable(){
+////		// @ formatter:off
+////		return schoolSubjectDao.findAll().stream().map(SchoolSubject::new).toList(); 
+////		// @formatter: on 
+//		
+//		 List<Subject> subjects = subjectDao.findAll();
+//		 List<School> schools = schoolDao.findAll();
+//		 List<SchoolSubject> response = new LinkedList<>();
+//		 
+//		 for(Subject subject : subjects){ 
+//			 response.add(new SchoolSubject(subject)); 
+//		}
+//		 
+//		 for(School school : schools) {
+//			 response.add(new SchoolSubject(school)); 
+//		 }
+//		 
+//		 return response; 
+//		
+//	}
 
 //	@Transactional(readOnly = true)
 //	public SchoolSubject retrieveSubjectById(Long schoolId, Long subjectId) {
@@ -286,6 +315,14 @@ public class SchoolService {
 				.orElseThrow(() -> new NoSuchElementException("Subject with ID = " + subjectId + " does not exist."));
 	}
 }
+	
+//	@Transactional(readOnly = true)
+//	public SchoolSubjectTable retrieveSubjectBySchoolId(Long schoolId){
+//		Optional<SchoolSubjectTable> school = schoolSubjectDao.findById(schoolId); 
+//		return school.orElseThrow(() -> new NoSuchElementException("School with ID = " + schoolId + " does not exist."));
+//		
+//	}
+	
 
 // EVERYTHING BELOW WAS FROM JULY 3 OR BEFORE:
 //@Service 
