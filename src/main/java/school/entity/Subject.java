@@ -22,11 +22,6 @@ public class Subject {
 	private String subjectName; // math, history
 	private String subjectLevel; // honors, AP, etc.   
 	
-	/*@EqualsAndHashCode.Exclude
-	@ToString.Exclude
-	@OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true) // the One to many relationship
-	private Set<Teacher> teachers = new HashSet<>(); */
-	
 	// Many (school) to Many (subjects)
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude

@@ -34,11 +34,13 @@ public class SchoolService {
 	@Autowired
 	private SubjectDao subjectDao;
 
+	/* 							SCHOOL METHODS 								*/
+	// save school method: gets school Id and finds/creates school with ID.
+	// throws exception if null
 	@Transactional(readOnly = false)
 	public SchoolData saveSchool(SchoolData schoolData) {
 		Long schoolId = schoolData.getSchoolId();
 		School school;
-		// = findOrCreateSchool(schoolData.getSchoolId());
 
 		if (schoolId == null) {
 			school = findOrCreateSchool(schoolId);
@@ -51,18 +53,16 @@ public class SchoolService {
 
 		copySchoolFields(school, schoolData);
 		return new SchoolData(schoolDao.save(school));
-
 	}
 
-	// setFields in Contributor method guide I
+	// Copies school data values
 	private void copySchoolFields(School school, SchoolData schoolData) {
-		// Example:
-		// contributor.setContributorEmail(contributorData.getContributorEmail());
 		school.setSchoolId(schoolData.getSchoolId());
 		school.setSchoolName(schoolData.getSchoolName());
 		school.setSchoolType(schoolData.getSchoolType());
 	}
 
+	// finds school based off ID, or creates school based off ID
 	private School findOrCreateSchool(Long schoolId) {
 		School school;
 
@@ -76,141 +76,7 @@ public class SchoolService {
 		return school;
 	}
 
-	public School findSchoolById(Long schoolId) {
-		return schoolDao.findById(schoolId).orElse(null);
-	}
-	@Transactional(readOnly = false)
-	public SchoolTeacher updateTeacher(Long teacherId, SchoolTeacher schoolTeacher) {
-		Teacher teacher =  teacherDao.findById(teacherId)
-				.orElseThrow(() -> new NoSuchElementException("Teacher with ID = " + teacherId + " was not found"));
-		
-		copyTeacherFields(teacher, schoolTeacher);
-		
-		Teacher dbTeacher = teacherDao.save(teacher);
-		return new SchoolTeacher(dbTeacher); 
-	}
-	
-	@Transactional(readOnly = false)
-	public SchoolSubject updateSubject(Long subjectId, SchoolSubject schoolSubject) {
-		Subject subject =  subjectDao.findById(subjectId)
-				.orElseThrow(() -> new NoSuchElementException("Subject with ID = " + subjectId + " was not found"));
-		
-		copySubjectFields(subject, schoolSubject);
-		
-		Subject dbSubject = subjectDao.save(subject);
-		return new SchoolSubject(dbSubject); 
-	}
-	
-	@Transactional(readOnly = false)
-	public SchoolTeacher saveTeacher(Long schoolId, SchoolTeacher schoolTeacher) {
-		School school = findSchoolById(schoolId);
-		Long teacherId = schoolTeacher.getTeacherId();
-		Teacher teacher = findOrCreateTeacher(schoolId, teacherId);
-
-		copyTeacherFields(teacher, schoolTeacher);
-
-		teacher.setSchool(school);
-		school.getTeachers().add(teacher);
-
-		Teacher dbTeacher = teacherDao.save(teacher);
-		return new SchoolTeacher(dbTeacher);
-	}
-	
-	
-//	@Transactional(readOnly = false)
-//	public SchoolTeacher updateTeacher(Long schoolId, SchoolTeacher schoolTeacher) {
-//		Long teacherId = schoolTeacher.getTeacherId();
-//		Teacher teacher = findOrCreateTeacher(schoolId, schoolTeacher.getTeacherId());
-//
-//		copyTeacherFields(teacher, schoolTeacher);
-//
-//		teacher.setSchool(school);
-//		school.getTeachers().add(teacher);
-//
-//		Teacher dbTeacher = teacherDao.save(teacher);
-//		return new SchoolTeacher(dbTeacher);
-//	}
-	
-	
-	private Teacher findOrCreateTeacher(Long schoolId, Long teacherId) {
-		Teacher teacher;
-
-		if (Objects.isNull(teacherId)) {
-			teacher = new Teacher();
-		} else {
-			teacher = findTeacherById(schoolId, teacherId);
-		}
-
-		return teacher;
-	}
-
-	private Teacher findTeacherById(Long schoolId, Long teacherId) {
-		// Note that findById returns an Optional. If the Optional is
-		// empty .orElseThrow throws a NoSuchElementException. If the
-		// Optional is not empty a Teacher is returned.
-		Teacher teacher = teacherDao.findById(teacherId)
-				.orElseThrow(() -> new NoSuchElementException("Teacher with ID = " + teacherId + " was not found"));
-		if (teacher.getSchool().getSchoolId().equals(schoolId)) {
-			return teacher;
-		} else {
-			throw new IllegalArgumentException("Invalid School ID for the teacher.");
-		}
-	}
-
-	private void copyTeacherFields(Teacher teacher, SchoolTeacher schoolTeacher) {
-		teacher.setTeacherId(schoolTeacher.getTeacherId());
-		teacher.setTeacherFirstName(schoolTeacher.getTeacherFirstName());
-		teacher.setTeacherLastName(schoolTeacher.getTeacherLastName());
-		teacher.setTeacherEmail(schoolTeacher.getTeacherEmail());
-	}
-	@Transactional(readOnly = false)
-	public SchoolSubject saveSubject(Long schoolId, SchoolSubject schoolSubject) {
-		School school = findSchoolById(schoolId);
-		Subject subject = findOrCreateSubject(schoolId, schoolSubject.getSubjectId());
-
-		copySubjectFields(subject, schoolSubject);
-
-		Set<School> schools = new HashSet<>();
-		schools.add(school);
-
-		subject.setSchools(schools);
-		school.getSubjects().add(subject);
-
-		return new SchoolSubject(subjectDao.save(subject));
-	}
-
-	private Subject findSubjectById(Long schoolId, Long subjectId) {
-		// Note that findById returns an Optional. If the Optional is
-		// empty .orElseThrow throws a NoSuchElementException. If the
-		// Optional is not empty an Customer is returned.
-		Optional<Subject> subjectOptional = subjectDao.findById(subjectId);
-		Subject subject = subjectOptional
-				.orElseThrow(() -> new NoSuchElementException("Subject with ID = " + subjectId + " was not found"));
-		if (subject.getSchools().stream().anyMatch(p -> p.getSchoolId().equals(schoolId))) {
-			return subject;
-		} else {
-			throw new IllegalArgumentException("Invalid school ID for the subject.");
-		}
-	}
-
-	private Subject findOrCreateSubject(Long schoolId, Long subjectId) {
-		Subject subject;
-
-		if (Objects.isNull(subjectId)) {
-			subject = new Subject();
-		} else {
-			subject = findSubjectById(schoolId, subjectId);
-		}
-
-		return subject;
-	}
-
-	private void copySubjectFields(Subject subject, SchoolSubject schoolSubject) {
-		subject.setSubjectId(schoolSubject.getSubjectId());
-		subject.setSubjectName(schoolSubject.getSubjectName());
-		subject.setSubjectLevel(schoolSubject.getSubjectLevel());
-	}
-
+	// Gets all school data
 	@Transactional(readOnly = true)
 	public List<SchoolData> retrieveAllSchools() {
 		List<School> schools = schoolDao.findAll();
@@ -227,25 +93,102 @@ public class SchoolService {
 		return result;
 	}
 
-	// Testing this method from Slack
-	
+	// Gets school data based off school ID
 	@Transactional(readOnly = true)
 	public SchoolData retrieveSchoolById(Long schoolId) {
-		School school = findSchoolById(schoolId); 
-		return new SchoolData(school); 
+		School school = findSchoolById(schoolId);
+		return new SchoolData(school);
 	}
-	/*@Transactional(readOnly = true)
-	public School retrieveSchoolById(Long schoolId) { 
-		return schoolDao.findById(schoolId)
-				.orElseThrow(() -> new NoSuchElementException("School with ID = " + schoolId + " does not exist."));
-	}*/ 
 
+	// Deletes school by school ID
 	public void deleteSchoolById(Long schoolId) {
 		School school = findSchoolById(schoolId);
 		schoolDao.delete(school);
-
 	}
 
+	// Finds school by ID
+	public School findSchoolById(Long schoolId) {
+		return schoolDao.findById(schoolId).orElse(null);
+	}
+
+	// Updates school
+	@Transactional(readOnly = false)
+	public SchoolData updateSchool(Long schoolId, SchoolData schoolData) {
+		School school = schoolDao.findById(schoolId)
+				.orElseThrow(() -> new NoSuchElementException("School with ID = " + schoolId + " was not found."));
+
+		copySchoolFields(school, schoolData);
+
+		School dbSchool = schoolDao.save(school);
+		return new SchoolData(dbSchool);
+	}
+
+	/* 							TEACHER METHODS 								*/
+
+	// Updates teacher data values
+	@Transactional(readOnly = false)
+	public SchoolTeacher updateTeacher(Long teacherId, SchoolTeacher schoolTeacher) {
+		Teacher teacher = teacherDao.findById(teacherId)
+				.orElseThrow(() -> new NoSuchElementException("Teacher with ID = " + teacherId + " was not found"));
+
+		copyTeacherFields(teacher, schoolTeacher);
+
+		Teacher dbTeacher = teacherDao.save(teacher);
+		return new SchoolTeacher(dbTeacher);
+	}
+
+	// Saves teacher values to database
+	@Transactional(readOnly = false)
+	public SchoolTeacher saveTeacher(Long schoolId, SchoolTeacher schoolTeacher) {
+		School school = findSchoolById(schoolId);
+		Long teacherId = schoolTeacher.getTeacherId();
+		Teacher teacher = findOrCreateTeacher(schoolId, teacherId);
+
+		copyTeacherFields(teacher, schoolTeacher);
+
+		teacher.setSchool(school);
+		school.getTeachers().add(teacher);
+
+		Teacher dbTeacher = teacherDao.save(teacher);
+		return new SchoolTeacher(dbTeacher);
+	}
+
+	// Finds teacher by ID or creates teacher if teacher does not exist
+	private Teacher findOrCreateTeacher(Long schoolId, Long teacherId) {
+		Teacher teacher;
+
+		if (Objects.isNull(teacherId)) {
+			teacher = new Teacher();
+		} else {
+			teacher = findTeacherById(schoolId, teacherId);
+		}
+
+		return teacher;
+	}
+
+	// Finds teacher by ID
+	private Teacher findTeacherById(Long schoolId, Long teacherId) {
+		// Note that findById returns an Optional. If the Optional is
+		// empty .orElseThrow throws a NoSuchElementException. If the
+		// Optional is not empty a Teacher is returned.
+		Teacher teacher = teacherDao.findById(teacherId)
+				.orElseThrow(() -> new NoSuchElementException("Teacher with ID = " + teacherId + " was not found"));
+		if (teacher.getSchool().getSchoolId().equals(schoolId)) {
+			return teacher;
+		} else {
+			throw new IllegalArgumentException("Invalid School ID for the teacher.");
+		}
+	}
+
+	// Copies teacher data values
+	private void copyTeacherFields(Teacher teacher, SchoolTeacher schoolTeacher) {
+		teacher.setTeacherId(schoolTeacher.getTeacherId());
+		teacher.setTeacherFirstName(schoolTeacher.getTeacherFirstName());
+		teacher.setTeacherLastName(schoolTeacher.getTeacherLastName());
+		teacher.setTeacherEmail(schoolTeacher.getTeacherEmail());
+	}
+
+	// Gets all teachers
 	@Transactional(readOnly = true)
 	public List<SchoolTeacher> retrieveAllTeachers() {
 		// @ fortmatter:off
@@ -253,242 +196,99 @@ public class SchoolService {
 		// @formatter: on
 	}
 
-	/*@Transactional(readOnly = true)
-	public SchoolTeacher retrieveTeacherById(Long schoolId, Long teacherId) {
-		Teacher teacher = findTeacherById(schoolId, teacherId);
-		return new SchoolTeacher(teacher);
-	}*/ 
-	
+	// Gets teacher based off teacher ID
 	@Transactional(readOnly = true)
 	public Teacher retrieveTeacherById(Long teacherId) {
 		return teacherDao.findById(teacherId)
 				.orElseThrow(() -> new NoSuchElementException("Teacher with ID = " + teacherId + " does not exist."));
 	}
 
-//	public void deleteTeacherById(Long schoolId, Long teacherId) {
-//		Teacher teacher = findTeacherById(schoolId, teacherId);
-//		teacherDao.delete(teacher);
-//	}
-	
+	// Deletes teacher based off ID
 	public void deleteTeacherById(Long teacherId) {
-		 Teacher teacher = retrieveTeacherById(teacherId);
-		 teacherDao.delete(teacher);
+		Teacher teacher = retrieveTeacherById(teacherId);
+		teacherDao.delete(teacher);
 	}
 
+	/* 							SUBJECT METHODS 								*/
+	// Saves subject
+	@Transactional(readOnly = false)
+	public SchoolSubject saveSubject(Long schoolId, SchoolSubject schoolSubject) {
+		School school = findSchoolById(schoolId);
+		Subject subject = findOrCreateSubject(schoolId, schoolSubject.getSubjectId());
+
+		copySubjectFields(subject, schoolSubject);
+
+		Set<School> schools = new HashSet<>();
+		schools.add(school);
+
+		subject.setSchools(schools);
+		school.getSubjects().add(subject);
+
+		return new SchoolSubject(subjectDao.save(subject));
+	}
+
+	// updates subject
+	@Transactional(readOnly = false)
+	public SchoolSubject updateSubject(Long subjectId, SchoolSubject schoolSubject) {
+		Subject subject = subjectDao.findById(subjectId)
+				.orElseThrow(() -> new NoSuchElementException("Subject with ID = " + subjectId + " was not found"));
+
+		copySubjectFields(subject, schoolSubject);
+
+		Subject dbSubject = subjectDao.save(subject);
+		return new SchoolSubject(dbSubject);
+	}
+
+	// Finds subject by Subject ID
+	private Subject findSubjectById(Long schoolId, Long subjectId) {
+		Optional<Subject> subjectOptional = subjectDao.findById(subjectId);
+		Subject subject = subjectOptional
+				.orElseThrow(() -> new NoSuchElementException("Subject with ID = " + subjectId + " was not found"));
+		if (subject.getSchools().stream().anyMatch(p -> p.getSchoolId().equals(schoolId))) {
+			return subject;
+		} else {
+			throw new IllegalArgumentException("Invalid school ID for the subject.");
+		}
+	}
+
+	// Finds subject or creates subject if it doesn't exist
+	private Subject findOrCreateSubject(Long schoolId, Long subjectId) {
+		Subject subject;
+
+		if (Objects.isNull(subjectId)) {
+			subject = new Subject();
+		} else {
+			subject = findSubjectById(schoolId, subjectId);
+		}
+
+		return subject;
+	}
+
+	// copies subject data values
+	private void copySubjectFields(Subject subject, SchoolSubject schoolSubject) {
+		subject.setSubjectId(schoolSubject.getSubjectId());
+		subject.setSubjectName(schoolSubject.getSubjectName());
+		subject.setSubjectLevel(schoolSubject.getSubjectLevel());
+	}
+
+	// Gets all subjects
 	@Transactional(readOnly = true)
 	public List<SchoolSubject> retrieveAllSubjects() {
 		// @ fortmatter:off
 		return subjectDao.findAll().stream().map(SchoolSubject::new).toList();
 		// @formatter: on
 	}
-	
-//	@Transactional(readOnly = true)
-//	public List<SchoolSubject> retrieveAllJoinTable(){
-////		// @ formatter:off
-////		return schoolSubjectDao.findAll().stream().map(SchoolSubject::new).toList(); 
-////		// @formatter: on 
-//		
-//		 List<Subject> subjects = subjectDao.findAll();
-//		 List<School> schools = schoolDao.findAll();
-//		 List<SchoolSubject> response = new LinkedList<>();
-//		 
-//		 for(Subject subject : subjects){ 
-//			 response.add(new SchoolSubject(subject)); 
-//		}
-//		 
-//		 for(School school : schools) {
-//			 response.add(new SchoolSubject(school)); 
-//		 }
-//		 
-//		 return response; 
-//		
-//	}
 
-//	@Transactional(readOnly = true)
-//	public SchoolSubject retrieveSubjectById(Long schoolId, Long subjectId) {
-//		Subject subject = findSubjectById(schoolId, subjectId);
-//		return new SchoolSubject(subject);
-//	}
+	// Gets subject by subject ID
 	@Transactional(readOnly = true)
 	public Subject retrieveSubjectById(Long subjectId) {
 		return subjectDao.findById(subjectId)
 				.orElseThrow(() -> new NoSuchElementException("Subject with ID = " + subjectId + " does not exist."));
 	}
-}
-	
-//	@Transactional(readOnly = true)
-//	public SchoolSubjectTable retrieveSubjectBySchoolId(Long schoolId){
-//		Optional<SchoolSubjectTable> school = schoolSubjectDao.findById(schoolId); 
-//		return school.orElseThrow(() -> new NoSuchElementException("School with ID = " + schoolId + " does not exist."));
-//		
-//	}
-	
 
-// EVERYTHING BELOW WAS FROM JULY 3 OR BEFORE:
-//@Service 
-//public class SchoolService {
-//	
-//	@Autowired
-//	private SchoolDao schoolDao;
-//	
-//	@Autowired
-//	private TeacherDao teacherDao; 
-//	
-//	@Autowired
-//	private SubjectDao subjectDao; 
-//
-//	
-//	// School
-//	@Transactional(readOnly = false)
-//	public SchoolData saveSchool(SchoolData schoolData) {
-//		Long schoolId = schoolData.getSchoolId();
-//		School school = findOrCreateSchool(schoolId); 
-//		
-//		setFieldsInSchool(school, schoolData); // school is destination, school data is source
-//		return new SchoolData(schoolDao.save(school)); 
-//	}
-//	
-//	private void setFieldsInSchool(School school, SchoolData schoolData) {
-//	school.setSchoolName(schoolData.getSchoolName());
-//	school.setSchoolType(schoolData.getSchoolType());	
-//		
-//	}
-//
-//	private School findOrCreateSchool(Long schoolId) {
-//		School school; 
-//		
-//		if(Objects.isNull(schoolId)) {
-//			school = new School(); 
-//		}
-//		else {
-//			school = findSchoolById(schoolId); 
-//		}
-//		
-//		return school; 
-//	}
-//
-//	private School findSchoolById(Long schoolId) {
-//		return schoolDao.findById(schoolId).orElseThrow(() -> new NoSuchElementException("School with ID = " + schoolId + " was not found."));
-//	}
-//
-//	@Transactional(readOnly = true)
-//	public List<SchoolData> retrieveAllSchools() {
-//		// @ fortmatter:off
-//		return schoolDao.findAll()
-//		.stream()
-//		.map(SchoolData::new)
-//		.toList();
-//		// @formatter: on 
-//	}
-//	
-//	@Transactional(readOnly = true)
-//	public SchoolData retrieveSchoolById(Long schoolId) {
-//		School school = findSchoolById(schoolId);
-//		return new SchoolData(school); 
-//	}
-//
-//	
-//	// Teacher
-//	@Transactional(readOnly = false)
-//	public SchoolTeacher saveTeacher(Long schoolId, /*Long subjectId, */ SchoolTeacher schoolTeacher) {
-//		School school = findSchoolById(schoolId); 
-//		//Subject subject = findSubjectById(schoolId, subjectId); 
-//		Long teacherId = schoolTeacher.getTeacherId();
-//		Teacher teacher = findOrCreateTeacher(schoolId, /*subjectId, */ teacherId); 
-//		
-//		setFieldsInTeacher(teacher, schoolTeacher); // teacher is destination, teacherdata is source
-//		
-//		return new SchoolTeacher(teacherDao.save(teacher)); 
-//	}
-//	
-//	private Teacher findOrCreateTeacher(Long schoolId, /*Long subjectId,*/ Long teacherId) {
-//		Teacher teacher;  
-//		
-//		if(Objects.isNull(teacherId)) {
-//			teacher = new Teacher(); 
-//		}
-//		else {
-//			teacher = findTeacherById(schoolId, teacherId); 
-//		}
-//		
-//		return teacher; 
-//	}
-//
-//	private Teacher findTeacherById(Long schoolId, Long teacherId) {
-//		return teacherDao.findById(teacherId).orElseThrow(() -> new NoSuchElementException("Teacher with ID = " + teacherId + " was not found."));
-//	}
-//
-//	private void setFieldsInTeacher(Teacher teacher, SchoolTeacher teacherData) {
-//		teacher.setTeacherFirstName(teacherData.getTeacherFirstName());
-//		teacher.setTeacherLastName(teacherData.getTeacherLastName());
-//	}
-//
-//	public List<SchoolTeacher> retrieveAllTeachers() {
-//		// @ fortmatter:off
-//				return teacherDao.findAll()
-//				.stream()
-//				.map(SchoolTeacher::new)
-//				.toList();
-//				// @formatter: on 
-//	}
-//
-//	public SchoolTeacher retrieveTeacherById(Long schoolId, Long teacherId) {
-//		Teacher teacher = findTeacherById(schoolId, teacherId);
-//		return new SchoolTeacher(teacher); 
-//	}
-//
-//	@Transactional(readOnly = false)
-//	public void deleteTeacherById(Long schoolId, Long teacherId) {
-//		Teacher teacher = findTeacherById(schoolId, teacherId);
-//		teacherDao.delete(teacher); 
-//	}
-//	
-//	// Subject
-//
-//	@Transactional(readOnly = false)
-//	public SchoolSubject saveSubject(Long schoolId, SchoolSubject schoolSubject) {
-//		School school = findSchoolById(schoolId); 
-//		Long subjectId = schoolSubject.getSubjectId();
-//		Subject subject = findOrCreateSubject(schoolId, subjectId); 
-//		
-//		setFieldsInSubject(subject, schoolSubject); // teacher is destination, teacherdata is source
-//		
-//		return new SchoolSubject(subjectDao.save(subject)); 
-//	}
-//
-//	private void setFieldsInSubject(Subject subject, SchoolSubject schoolSubject) {
-//		subject.setSubjectName(schoolSubject.getSubjectName());
-//		subject.setSubjectLevel(schoolSubject.getSubjectLevel());
-//	}
-//
-//	private Subject findOrCreateSubject(Long schoolId, Long subjectId) {
-//		Subject subject;  
-//		
-//		if(Objects.isNull(subjectId)) {
-//			subject = new Subject(); 
-//		}
-//		else {
-//			subject = findSubjectById(schoolId, subjectId); 
-//		}
-//		
-//		return subject; 
-//	}
-//
-//	private Subject findSubjectById(Long schoolId, Long subjectId) {
-//		return subjectDao.findById(subjectId).orElseThrow(() -> new NoSuchElementException("Subject with ID = " + subjectId + " was not found."));
-//	}
-//
-//	public List<SchoolSubject> retrieveAllSubjects() {
-//		// @ fortmatter:off
-//		return subjectDao.findAll()
-//		.stream()
-//		.map(SchoolSubject::new)
-//		.toList();
-//		// @formatter: on 
-//	}
-//
-//	public SchoolSubject retrieveSubjectById(Long schoolId, Long subjectId) {
-//		Subject subject = findSubjectById(schoolId, subjectId);
-//		return new SchoolSubject(subject); 
-//	}
-//}
+	// Deletes subject by subject Id
+	public void deleteSubjectById(Long subjectId) {
+		Subject subject = retrieveSubjectById(subjectId);
+		subjectDao.delete(subject);
+	}
+}
