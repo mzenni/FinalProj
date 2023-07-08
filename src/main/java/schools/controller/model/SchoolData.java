@@ -34,6 +34,7 @@ public class SchoolData {
 		}
 	}
 
+	// subject sub class
 	@Data
 	@NoArgsConstructor
 	public static class SchoolSubject {
@@ -48,6 +49,7 @@ public class SchoolData {
 		}
 	}
 
+	// teacher sub class
 	@Data
 	@NoArgsConstructor
 	public static class SchoolTeacher {
