@@ -21,7 +21,7 @@ import school.entity.Teacher;
 import schools.controller.model.SchoolData;
 import schools.controller.model.SchoolData.SchoolSubject;
 import schools.controller.model.SchoolData.SchoolTeacher;
-
+// All service methods in School Service
 @Service
 public class SchoolService {
 
